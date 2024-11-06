@@ -1,8 +1,4 @@
 // // 1. IMPORT MANAGEMENT CANISTER
-// use ic_cdk::api::management_canister::http_request::{
-//     http_request, CanisterHttpRequestArgument, HttpHeader, HttpMethod, HttpResponse, TransformArgs,
-//     TransformContext, TransformFunc,
-// };
 
 use candid::{CandidType, Nat};
 use ic_cdk::api::*;
