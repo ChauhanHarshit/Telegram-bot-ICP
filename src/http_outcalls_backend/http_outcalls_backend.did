@@ -1,3 +1,61 @@
+// service : {
+//   // Update function to send a message to Telegram
+//   "send_telegram_message": (text) -> (text);
+
+//   // Transform function to process HTTP response data
+//   "transform": (record { 
+//       response: record {
+//           status: nat;
+//           headers: vec record { name: text; value: text };
+//           body: vec nat8;
+//       }
+//   }) -> (record {
+//       status: nat;
+//       headers: vec record { name: text; value: text };
+//       body: vec nat8;
+//   }) query;
+// }
+
+
+type HeaderField = record { name: text; value: text };
+
+type HttpRequest = record {
+    method: text;
+    url: text;
+    headers: vec HeaderField;
+    body: vec nat8;
+};
+
+type HttpResponse = record {
+    status: nat;
+    headers: vec HeaderField;
+    body: vec nat8;
+};
+
+type TelegramMessageContent = record {
+    message_id: int;
+    from: TelegramUser;
+    chat: TelegramChat;
+    text: opt text;
+};
+
+type TelegramUser = record {
+    id: int;
+    is_bot: bool;
+    first_name: text;
+    username: opt text;
+};
+
+type TelegramChat = record {
+    id: int;
+    chat_type: text;
+};
+
+type TelegramMessage = record {
+    update_id: int;
+    message: TelegramMessageContent;
+};
+
 service : {
-    "greet": (text) -> (text) query;
+    receive_telegram_message: (HttpRequest) -> (HttpResponse);
 }

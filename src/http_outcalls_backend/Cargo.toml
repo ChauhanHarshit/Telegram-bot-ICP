@@ -10,5 +10,10 @@ crate-type = ["cdylib"]
 
 [dependencies]
 candid = "0.10"
-ic-cdk = "0.13"
-ic-cdk-timers = "0.7" # Feel free to remove this dependency if you don't need timers
+ic-cdk = "0.17"
+ic-cdk-macros = "0.17.0"
+ic-stable-structures = "0.6.2"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+telegram-bot-raw = "0.8.0" # If you're using telegram-bot-raw for Telegram API interaction
+lazy_static = "1.4" # For global static variables
