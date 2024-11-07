@@ -1,15 +1,7 @@
 // // 1. IMPORT MANAGEMENT CANISTER
 
-use candid::{CandidType, Nat};
-use ic_cdk::api::*;
-use ic_cdk_macros::*;
-// use ic_cdk::api::management_canister::http_request::{ HttpHeader, HttpResponse};
-use ic_cdk::api::management_canister::http_request::{
-    http_request, CanisterHttpRequestArgument, HttpHeader, HttpMethod, HttpResponse, TransformArgs,
-    TransformContext, TransformFunc,
-};
-use serde::Deserialize;
-use serde_json::{json, Value}; // Import serde_json to parse JSON
+
+// https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=3s2f2-niaaa-aaaam-adqwa-cai
 
 // // Update method using the HTTPS outcalls feature
 // #[ic_cdk::update]
@@ -184,81 +176,94 @@ use serde_json::{json, Value}; // Import serde_json to parse JSON
 //     }
 // }
 
-#[ic_cdk::update]
-async fn send_telegram_message(message: String) -> String {
-    // Set the Telegram API endpoint and bot token
-    let bot_token = "BOT_TOKEN"; // Replace this with your actual Telegram bot token
-    let chat_id = "CHAT_ID"; // Replace this with the chat ID you want to send messages to
-    let url = format!("https://api.telegram.org/bot{}/sendMessage", bot_token);
+// #[ic_cdk::update]
+// async fn send_telegram_message(message: String) -> String {
+//     // Set the Telegram API endpoint and bot token
+//     let bot_token = "BOT_TOKEN"; // Replace this with your actual Telegram bot token
+//     let chat_id = "CHAT_ID"; // Replace this with the chat ID you want to send messages to
+//     let url = format!("https://api.telegram.org/bot{}/sendMessage", bot_token);
 
-    // Prepare headers (Telegram API does not require authorization headers for bot requests)
-    let request_headers = vec![HttpHeader {
-        name: "Content-Type".to_string(),
-        value: "application/json".to_string(),
-    }];
+//     // Prepare headers (Telegram API does not require authorization headers for bot requests)
+//     let request_headers = vec![HttpHeader {
+//         name: "Content-Type".to_string(),
+//         value: "application/json".to_string(),
+//     }];
 
-    // Construct the JSON payload for the Telegram message
-    let payload = json!({
-        "chat_id": chat_id,
-        "text": message
-    });
-    let request_body = serde_json::to_vec(&payload).expect("Failed to serialize payload");
+//     // Construct the JSON payload for the Telegram message
+//     let payload = json!({
+//         "chat_id": chat_id,
+//         "text": message
+//     });
+//     let request_body = serde_json::to_vec(&payload).expect("Failed to serialize payload");
 
-    // Set up the HTTP request argument
-    let request = CanisterHttpRequestArgument {
-        url: url.clone(),
-        method: HttpMethod::POST,
-        body: Some(request_body),
-        max_response_bytes: None, // Optional
-        transform: Some(TransformContext {
-            function: TransformFunc(candid::Func {
-                principal: ic_cdk::api::id(),
-                method: "transform".to_string(),
-            }),
-            context: vec![],
-        }),
-        headers: request_headers,
-    };
+//     // Set up the HTTP request argument
+//     let request = CanisterHttpRequestArgument {
+//         url: url.clone(),
+//         method: HttpMethod::POST,
+//         body: Some(request_body),
+//         max_response_bytes: None, // Optional
+//         transform: Some(TransformContext {
+//             function: TransformFunc(candid::Func {
+//                 principal: ic_cdk::api::id(),
+//                 method: "transform".to_string(),
+//             }),
+//             context: vec![],
+//         }),
+//         headers: request_headers,
+//     };
 
-    // Specify the cycles for the HTTP outcall
-    let cycles = 100_000_000_000u64;
+//     // Specify the cycles for the HTTP outcall
+//     let cycles = 100_000_000_000u64;
 
-    // Make the HTTP request and process the response
-    match http_request(request, cycles as u128).await {
-        Ok((response,)) => {
-            let body_text =
-                String::from_utf8(response.body).expect("Response body is not valid UTF-8.");
+//     // Make the HTTP request and process the response
+//     match http_request(request, cycles as u128).await {
+//         Ok((response,)) => {
+//             let body_text =
+//                 String::from_utf8(response.body).expect("Response body is not valid UTF-8.");
 
-            ic_cdk::api::print(format!("Raw response from Telegram: {}", body_text)); // Log the response
+//             ic_cdk::api::print(format!("Raw response from Telegram: {}", body_text)); // Log the response
 
-            let json: Value =
-                serde_json::from_str(&body_text).expect("Failed to parse JSON response.");
+//             let json: Value =
+//                 serde_json::from_str(&body_text).expect("Failed to parse JSON response.");
 
-            if let Some(ok) = json["ok"].as_bool() {
-                if ok {
-                    "Message sent successfully!".to_string()
-                } else {
-                    "Failed to send message.".to_string()
-                }
-            } else {
-                "Unexpected response structure.".to_string()
-            }
-        }
-        Err((r, m)) => {
-            format!("The http_request resulted in an error. RejectionCode: {r:?}, Error: {m}")
-        }
-    }
-}
+//             if let Some(ok) = json["ok"].as_bool() {
+//                 if ok {
+//                     "Message sent successfully!".to_string()
+//                 } else {
+//                     "Failed to send message.".to_string()
+//                 }
+//             } else {
+//                 "Unexpected response structure.".to_string()
+//             }
+//         }
+//         Err((r, m)) => {
+//             format!("The http_request resulted in an error. RejectionCode: {r:?}, Error: {m}")
+//         }
+//     }
+// }
 
-// Transform function to process the HTTP response
-#[ic_cdk::query]
-fn transform(raw: TransformArgs) -> HttpResponse {
-    HttpResponse {
-        status: raw.response.status.clone(),
-        body: raw.response.body.clone(),
-        headers: vec![], // You may include any additional necessary headers here
-    }
-}
+// // Transform function to process the HTTP response
+// #[ic_cdk::query]
+// fn transform(raw: TransformArgs) -> HttpResponse {
+//     HttpResponse {
+//         status: raw.response.status.clone(),
+//         body: raw.response.body.clone(),
+//         headers: vec![], // You may include any additional necessary headers here
+//     }
+// }
+
+use ic_cdk::export_candid;
+use candid::{CandidType, Nat};
+use ic_cdk::api::*;
+use ic_cdk_macros::*;
+// use ic_cdk::api::management_canister::http_request::{ HttpHeader, HttpResponse};
+use ic_cdk::api::management_canister::http_request::{
+    http_request, CanisterHttpRequestArgument, HttpHeader, HttpMethod, HttpResponse, TransformArgs,
+    TransformContext, TransformFunc,
+};
+use serde::Deserialize;
+use serde_json::{json, Value}; // Import serde_json to parse JSON
+
 
 // Define your request and response structures
 #[derive(CandidType, Deserialize)]
@@ -267,20 +272,13 @@ pub struct TelegramMessage {
     message: TelegramMessageContent,
 }
 
-#[derive(CandidType, Deserialize)]
+#[derive(CandidType, Deserialize, Debug)]
 pub struct HttpRequest {
     pub method: String,
     pub url: String,
     pub headers: Vec<HeaderField>,
     pub body: Vec<u8>,
 }
-
-// #[derive(CandidType)]
-// pub struct HttpResponse {
-//     pub status: u16,
-//     pub headers: Vec<HeaderField>,
-//     pub body: Vec<u8>,
-// }
 
 #[derive(CandidType, Deserialize)]
 pub struct TelegramMessageContent {
@@ -305,19 +303,20 @@ pub struct TelegramChat {
 }
 
 // Define HttpRequest if it is not available in any library
-#[derive(CandidType, Deserialize)]
+#[derive(CandidType, Deserialize , Debug)]
 pub struct HeaderField(pub String, pub String);
 
 // Handle incoming messages from Telegram
-#[query]
+#[update]
 async fn receive_telegram_message(req: HttpRequest) -> HttpResponse {
-    // Log the incoming request for debugging
-    ic_cdk::print(format!(
-        "Received a request with method: {} and URL: {}",
-        req.method, req.url
-    ));
+    ic_cdk::print("receive_telegram_message function called");
 
-    // Attempt to deserialize the message and log the outcome
+    ic_cdk::print(format!("Received request: {:?}", req));
+
+    // Log raw body content
+    ic_cdk::print(format!("Raw request body: {:?}", req.body));
+
+    // Attempt to deserialize the message
     let message: TelegramMessage = match serde_json::from_slice(&req.body) {
         Ok(msg) => {
             ic_cdk::print("Successfully deserialized Telegram message.");
@@ -326,7 +325,7 @@ async fn receive_telegram_message(req: HttpRequest) -> HttpResponse {
         Err(e) => {
             ic_cdk::print(format!("Failed to deserialize Telegram message: {:?}", e));
             return HttpResponse {
-                status: Nat::from(400 as u64), // Return a 400 Bad Request on deserialization failure
+                status: Nat::from(400 as u64),
                 headers: vec![HttpHeader {
                     name: "Content-Type".to_string(),
                     value: "application/json".to_string(),
@@ -336,20 +335,15 @@ async fn receive_telegram_message(req: HttpRequest) -> HttpResponse {
         }
     };
 
-    // Process the deserialized message and log its content
     if let Some(text) = message.message.text {
-        let response = format!("Received message text: {}", text);
-        ic_cdk::print(response.clone());
+        ic_cdk::print(format!("Received message text: {}", text));
     } else {
         ic_cdk::print("No message text found in Telegram message.");
     }
 
-    // Log response before returning
     ic_cdk::print("Sending a success response to Telegram.");
-
-    // Respond with a success message
     HttpResponse {
-        status: Nat::from(200 as u64), // Status OK
+        status: Nat::from(200 as u64),
         headers: vec![HttpHeader {
             name: "Content-Type".to_string(),
             value: "application/json".to_string(),
@@ -358,4 +352,6 @@ async fn receive_telegram_message(req: HttpRequest) -> HttpResponse {
     }
 }
 
+
+export_candid!();
 

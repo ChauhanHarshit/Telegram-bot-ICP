@@ -3,7 +3,10 @@
     "http_outcalls_backend": {
       "candid": "src/http_outcalls_backend/http_outcalls_backend.did",
       "package": "http_outcalls_backend",
-      "type": "rust"
+      "type": "rust",
+      "http_access": [
+        "3s2f2-niaaa-aaaam-adqwa-cai"
+      ]
     }
   },
   "defaults": {
